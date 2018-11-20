@@ -13,8 +13,9 @@ from spacy.tokens import Doc
 
 JsonDict = Dict[str, Any]
 
-PredictionRequest = namedtuple("PredictionRequest", ["layer", "feature", "document", "typeSystem"])
+PredictionRequest = namedtuple("PredictionRequest", ["layer", "feature", "projectId", "document", "typeSystem"])
 PredictionResponse = namedtuple("PredictionResponse", ["document"])
+Document = namedtuple("Document", ["xmi", "documentId", "userId"])
 
 # Constants
 
@@ -44,6 +45,10 @@ def route_predict_ner():
 
 @app.route("/ner/train", methods=["POST"])
 def route_train_ner():
+    json_data = request.get_json()
+    import json
+    with open('req.json', 'w') as f:
+        json.dump(json_data, f)
     return ('', 204)
 
 
@@ -65,14 +70,20 @@ def route_train_pos():
     return ('', 204)
 
 
-#
-
 def parse_prediction_request(json_object: JsonDict) -> PredictionRequest:
-    layer = json_object["layer"]
-    feature = json_object["feature"]
-    document = base64.standard_b64decode(json_object["document"]).decode("utf-8")
-    typesystem = base64.standard_b64decode(json_object["typeSystem"]).decode("utf-8")
-    return PredictionRequest(layer, feature, document, typesystem)
+    metadata = json_object["metadata"]
+    document = json_object["document"]
+
+    layer = metadata["layer"]
+    feature = metadata["feature"]
+    projectId = metadata["projectId"]
+
+    xmi = document["xmi"]
+    documentId = document["documentId"]
+    userId = document["userId"]
+    typesystem = json_object["typeSystem"]
+
+    return PredictionRequest(layer, feature, projectId, Document(xmi, documentId, userId), typesystem)
 
 
 # NLP
@@ -80,7 +91,7 @@ def parse_prediction_request(json_object: JsonDict) -> PredictionRequest:
 def predict_ner(prediction_request: PredictionRequest) -> PredictionResponse:
     # Load the CAS and type system from the request
     typesystem = load_typesystem(prediction_request.typeSystem)
-    cas = load_cas_from_xmi(prediction_request.document, typesystem=typesystem)
+    cas = load_cas_from_xmi(prediction_request.document.xmi, typesystem=typesystem)
     AnnotationType = typesystem.get_type(prediction_request.layer)
 
     # Extract the tokens from the CAS and create a spacy doc from it
@@ -99,17 +110,14 @@ def predict_ner(prediction_request: PredictionRequest) -> PredictionResponse:
         annotation = AnnotationType(**fields)
         cas.add_annotation(annotation)
 
-    # Convert the CAs to xmi and encode it base64
-    xmi = cas.to_xmi().encode('utf-8')
-    encoded_xmi = base64.standard_b64encode(xmi).decode("utf-8")
-
-    return PredictionResponse(encoded_xmi)
+    xmi = cas.to_xmi()
+    return PredictionResponse(xmi)
 
 
 def predict_pos(prediction_request: PredictionRequest) -> PredictionResponse:
     # Load the CAS and type system from the request
     typesystem = load_typesystem(prediction_request.typeSystem)
-    cas = load_cas_from_xmi(prediction_request.document, typesystem=typesystem)
+    cas = load_cas_from_xmi(prediction_request.document.xmi, typesystem=typesystem)
     AnnotationType = typesystem.get_type(prediction_request.layer)
 
     # Extract the tokens from the CAS and create a spacy doc from it
@@ -128,15 +136,12 @@ def predict_pos(prediction_request: PredictionRequest) -> PredictionResponse:
         annotation = AnnotationType(**fields)
         cas.add_annotation(annotation)
 
-    # Convert the CAs to xmi and encode it base64
-    xmi = cas.to_xmi().encode('utf-8')
-    encoded_xmi = base64.standard_b64encode(xmi).decode("utf-8")
-
-    return PredictionResponse(encoded_xmi)
+    xmi = cas.to_xmi()
+    return PredictionResponse(xmi)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
     """
     # For debugging purposes, load a json file containing the request and process it.
     import json
