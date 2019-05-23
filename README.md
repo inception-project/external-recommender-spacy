@@ -18,16 +18,13 @@ This project uses Python ≥ 3.5, `Flask`, `spacy` and `dkpro-cassis`. It is rec
     
     python -m spacy download ${MODEL_NAME}
     
-from the command line where `${MODEL_NAME}` is the name for the model. A list of pretrained models can be found on the [spacy page](https://spacy.io/usage/models#section-available). Make sure that the model has the capabillities you want, this project needs for instance by default `syntax` for tagging and `entities` for named entity recognition. The model name has then to be altered in `app.py`:
-
-    
-    nlp = spacy.load('${MODEL_NAME}', disable=['parser']) 
+from the command line where `${MODEL_NAME}` is the name for the model. A list of pretrained models can be found on the [spacy page](https://spacy.io/usage/models#section-available). Make sure that the model has the capabilities you want, this project needs for instance by default `syntax` for tagging and `entities` for named entity recognition.
 
 ## Usage
 
 After everything has been set up, the recommender then can be started from the command line by calling
 
-    python app.py
+    python app.py ${MODEL_NAME}
     
 When used in production, it is better to deploy this Flask project on an actual application server like [Gunicorn](https://gunicorn.org/).
 

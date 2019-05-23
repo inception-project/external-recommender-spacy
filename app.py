@@ -1,5 +1,6 @@
 import base64
 from collections import namedtuple
+import sys
 from typing import Any, Dict
 
 from flask import Flask, request, jsonify
@@ -24,7 +25,8 @@ TOKEN_TYPE = "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token"
 
 # Models
 
-nlp = spacy.load('en', disable=['parser'])
+model_name = sys.argv[2] if len(sys.argv) >= 2 else 'en'
+nlp = spacy.load(model_name, disable=['parser'])
 
 # Routes
 
