@@ -45,10 +45,7 @@ def route_predict_ner():
 
 @app.route("/ner/train", methods=["POST"])
 def route_train_ner():
-    json_data = request.get_json()
-    import json
-    with open('req.json', 'w') as f:
-        json.dump(json_data, f)
+    # Return empty response
     return ('', 204)
 
 
