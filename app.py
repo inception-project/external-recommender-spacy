@@ -25,7 +25,7 @@ TOKEN_TYPE = "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token"
 
 # Models
 
-model_name = sys.argv[2] if len(sys.argv) >= 2 else 'en'
+model_name = sys.argv[1] if len(sys.argv) >= 2 else 'en'
 nlp = spacy.load(model_name, disable=['parser'])
 
 # Routes
