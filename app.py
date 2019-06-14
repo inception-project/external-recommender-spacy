@@ -22,6 +22,7 @@ Document = namedtuple("Document", ["xmi", "documentId", "userId"])
 
 SENTENCE_TYPE = "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence"
 TOKEN_TYPE = "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token"
+IS_PREDICTION = "inception_internal_predicted"
 
 # Models
 
@@ -105,6 +106,7 @@ def predict_ner(prediction_request: PredictionRequest) -> PredictionResponse:
     for ent in doc.ents:
         fields = {'begin': tokens[ent.start].begin,
                   'end': tokens[ent.end - 1].end,
+                  IS_PREDICTION: True,
                   prediction_request.feature: ent.label_}
         annotation = AnnotationType(**fields)
         cas.add_annotation(annotation)
@@ -131,6 +133,7 @@ def predict_pos(prediction_request: PredictionRequest) -> PredictionResponse:
     for token in doc:
         fields = {'begin': tokens[token.i].begin,
                   'end': tokens[token.i].end,
+                  IS_PREDICTION: True,
                   prediction_request.feature: token.pos_}
         annotation = AnnotationType(**fields)
         cas.add_annotation(annotation)
