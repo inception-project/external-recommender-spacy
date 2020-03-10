@@ -1,5 +1,7 @@
 # external-recommender-spacy
 
+> Please use https://github.com/inception-project/inception-external-recommender
+
 This project contains an example external recommender for the [INCEpTION annotation platform](https://inception-project.github.io/). It is used to recommend possible named entities and part-of-speech tags to an annotator in order to speed up annotation and improve annotation quality. It uses [spacy](https://spacy.io/) internally to do this predictions and [Flask](http://flask.pocoo.org/) as the web framework.
 
 The request format is described in the [INCEpTION external recommender documentation](https://inception-project.github.io//releases/0.6.1/docs/developer-guide.html#_external_recommender).
